@@ -31,6 +31,7 @@ export default new Vuex.Store({
       state.peerType = peerType
     },
     syncNode(state, libp2p) {
+      Vue.set(state, 'p2pNode', null); // This must be inserted first in order for Vuex to detect the state state change 
       Vue.set(state, 'p2pNode', libp2p);
     }
   },
