@@ -30,7 +30,7 @@ export default new Vuex.Store({
       }
     },
     setRemoteIP(state, value) {
-      state.reomteIP = value
+      state.remoteIP = value
     },
     disconnect(state) {
       state.p2pNode.stop()
@@ -109,8 +109,9 @@ export default new Vuex.Store({
     connect({ commit }, lan) {
       commit('connect', lan)
     },
-    setRemoteIP({ commit }, value) {
+    setRemoteIP({ commit, dispatch }, value, lan) {
       commit('setRemoteIP', value)
+      dispatch('connect', lan)
     },
     disconnect({ commit }) {
       commit('disconnect')

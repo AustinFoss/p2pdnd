@@ -6,7 +6,7 @@
     <h3>Connect to Game Over</h3>
     <button type="button" name="button" @click="connect(true)">Local Area Network (LAN)</button>
     <p> or </p>
-    <button type="button" name="button" @click="setRemoteIP(); connect(false)">Peer to Peer (P2P)</button>
+    <button type="button" name="button" @click="setRemoteIP(ip, false)">Peer to Peer (P2P)</button>
     <p>@</p>
     <input v-model="ip" maxlength="15" placeholder="255.255.255.255">
 
