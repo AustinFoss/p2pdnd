@@ -1,13 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-const Libp2p = require('libp2p')
-const Websockets = require('libp2p-websockets')
-const WebRTCStar = require('libp2p-webrtc-star')
-const Secio = require('libp2p-secio')
-const Mplex = require('libp2p-mplex')
-const remoteAddr = '/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star/p2p/'
-const localAddr = '/ip4/0.0.0.0/tcp/9090/wss/p2p-webrtc-star'
-const usingLocalAddr = true
+import Libp2p from 'libp2p'
+import Websockets from 'libp2p-websockets'
+import WebRTCStar from 'libp2p-webrtc-star'
+import Secio from 'libp2p-secio'
+import Mplex from 'libp2p-mplex'
 
 Vue.use(Vuex)
 
@@ -15,23 +12,36 @@ export default new Vuex.Store({
 
   state: {
     p2pNode: null, // the libp2p node instance and API access
-    inGame: false,
     peerType: false, //false for pc, true for dm
+    placeholderIP: '', // If using P2P and no IP is provided use this one
+    remoteIP: '',
+    remoteAddr: `/ip4/45.32.229.107/tcp/9090/wss/p2p-webrtc-star/p2p/`,
+    localAddr: '/ip4/0.0.0.0/tcp/9090/wss/p2p-webrtc-star',
+    usingLocalAddr: null
   },
 
   mutations: {
-    inGameChange(state) {
-      if(state.inGame==false){
-        state.inGame=true
+    connect(state, lan) {
+      // First update the usingLocalAddr state
+      if(lan == true) {
+        state.usingLocalAddr = true
       } else {
-        state.inGame=false
+        state.usingLocalAddr = false
       }
+    },
+    setRemoteIP(state, value) {
+      state.reomteIP = value
+    },
+    disconnect(state) {
+      state.p2pNode.stop()
+      state.usingLocalAddr = null
+      state.remoteIP = ''
     },
     peerTypeSet(state, peerType) {
       state.peerType = peerType
     },
     syncNode(state, libp2p) {
-      Vue.set(state, 'p2pNode', null); // This must be inserted first in order for Vuex to detect the state state change 
+      Vue.set(state, 'p2pNode', null); // This must be inserted first in order for Vuex to detect the state state change
       Vue.set(state, 'p2pNode', libp2p);
     }
   },
@@ -51,10 +61,14 @@ export default new Vuex.Store({
       // libp2p will automatically attempt to dial to the signaling server so that it can
       // receive inbound connections from other peers
       let webrtcAddr = ''
-      if(usingLocalAddr == false) {
-        webrtcAddr = remoteAddr + libp2p.peerInfo.id._idB58String
+      if(this.state.usingLocalAddr == false) {
+        if(this.state.remoteIP == '') {
+          webrtcAddr = `/ip4/${this.state.placeholderIP}/tcp/9090/wss/p2p-webrtc-star/p2p/${libp2p.peerInfo.id._idB58String}`
+        } else {
+          webrtcAddr = `/ip4/${this.state.remoteIP}/tcp/9090/wss/p2p-webrtc-star/p2p/${libp2p.peerInfo.id._idB58String}`
+        }
       } else {
-        webrtcAddr = localAddr
+        webrtcAddr = this.state.localAddr
       }
       console.log(`Connecting to WebRTC Server: ${webrtcAddr}`);
       libp2p.peerInfo.multiaddrs.add(webrtcAddr)
@@ -73,8 +87,8 @@ export default new Vuex.Store({
 
       // Listen for peers disconnecting
       libp2p.on('peer:disconnect', (peerInfo) => {
-        console.log(this.state.p2pNode.registrar.connections.size);
         dispatch('syncNode', libp2p)
+        console.log(this.state.p2pNode.registrar.connections.size);
         console.log(`Disconnected from ${peerInfo.id.toB58String()}`)
       })
 
@@ -92,13 +106,14 @@ export default new Vuex.Store({
     syncNode({ commit }, libp2p) {
       commit('syncNode', libp2p)
     },
-
-    connectToGame({ commit }, peerType) {
-      commit('inGameChange')
-      commit('peerTypeSet', peerType)
+    connect({ commit }, lan) {
+      commit('connect', lan)
     },
-    disconnectFromGame({ commit }) {
-      commit('inGameChange')
+    setRemoteIP({ commit }, value) {
+      commit('setRemoteIP', value)
+    },
+    disconnect({ commit }) {
+      commit('disconnect')
     },
   },
 

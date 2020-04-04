@@ -1,21 +1,39 @@
 <template lang="html">
   <div class="main">
+
     <h1>Welcome!</h1>
-    <h3>Do you want to play as a:</h3>
-    <button type="button" name="dm" @click="connectToGame(true)">Dungeon Master</button>
-    <p> or a </p>
-    <button type="button" name="pc" @click="connectToGame(false)">Player Character</button>
+
+    <h3>Connect to Game Over</h3>
+    <button type="button" name="button" @click="connect(true)">Local Area Network (LAN)</button>
+    <p> or </p>
+    <button type="button" name="button" @click="setRemoteIP(); connect(false)">Peer to Peer (P2P)</button>
+    <p>@</p>
+    <input v-model="ip" maxlength="15" placeholder="255.255.255.255">
+
   </div>
 </template>
 
 <script>
   import { mapActions } from 'vuex'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'Welcome',
+    data() {
+      return {
+        ip: ''
+      }
+    },
+    computed: {
+      ...mapState([
+        'remoteIP'
+      ]),
+    },
     methods: {
       ...mapActions([
-        'connectToGame'
+        'connect',
+        'disconnect',
+        'setRemoteIP'
       ])
     },
   }

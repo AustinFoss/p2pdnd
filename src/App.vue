@@ -1,11 +1,13 @@
 <template>
   <div id="app">
 
-    <div v-if="inGame == true">
+    <div v-if="usingLocalAddr != null">
       <Peers/>
     </div>
     <div v-else>
+
       <Welcome/>
+
     </div>
   </div>
 </template>
@@ -26,7 +28,8 @@ export default {
   },
   computed: {
     ...mapState([
-      'inGame'
+      'inGame',
+      'usingLocalAddr'
     ])
   },
   methods: {
