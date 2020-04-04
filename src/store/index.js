@@ -13,9 +13,9 @@ export default new Vuex.Store({
   state: {
     p2pNode: null, // the libp2p node instance and API access
     peerType: false, //false for pc, true for dm
-    placeholderIP: '', // If using P2P and no IP is provided use this one
+    // If using P2P and no IP is provided use this one
+    placeholderIP: '',
     remoteIP: '',
-    remoteAddr: `/ip4/45.32.229.107/tcp/9090/wss/p2p-webrtc-star/p2p/`,
     localAddr: '/ip4/0.0.0.0/tcp/9090/wss/p2p-webrtc-star',
     usingLocalAddr: null
   },
