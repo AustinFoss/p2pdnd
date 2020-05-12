@@ -1,5 +1,7 @@
 # p2pdnd
 
+Edit: Might revisit later this summer. First task will be to remove reliance on the webRTC relay server
+
 ## Project setup
 ```
 npm install
